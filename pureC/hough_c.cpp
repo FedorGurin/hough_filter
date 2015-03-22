@@ -1,42 +1,58 @@
 #include <string.h>
+#include "hough_c.h"
 //! преобразование Хафа
 //! image - указатель на изображение
 //! r0 - длина(в пикселях) отрезков по которым идет интерполирование,
 //! height - высота изображение
 //! width - ширина изображения
-typedef unsigned char uchar;
+
 #define R_MAX 10
 //! размеры изображения
-#define ROW_MAX 768
-#define COL_MAX 1024
+#define ROW_MAX 1080
+#define COL_MAX 1920
 //! копирование части изображения
 void copyPartImage(uchar* to,uchar *from,int size)
 {
     memcpy((void*)to,(void*)from,sizeof(uchar)*size);
 }
-//! создание индексов
-void createIndex(uchar* index,int r)
+//! создание индексной матрицы(ok)
+void createIndex(uchar* index,int r,int &col,int &row)
 {
-    //! создаем индексы
-    static uchar m11[2*R_MAX+1];
-    static uchar m12[2*R_MAX-1];
-    static uchar m13[2*R_MAX+1];//! тоже что и m11 только ином порядке
-    static uchar m14[2*R_MAX-1];//только сознаком минус
+    //кол-во столбцов
+    col=8*r;
+    //кол-во строк
+    row=2;
+    int rs=r<<1;
+    int j=0;
+    //! указатели на элементы индексной матрицы
+    uchar *m11=index +  (0);
+    uchar *m12=m11 +    (rs+1);
+    uchar *m13=m12 +    (rs-1);
+    uchar *m14=m13 +    (rs+1);
 
-    static uchar m21[2*R_MAX];
-    static uchar m22[2*R_MAX+1];
-    static uchar m23[2*R_MAX-1];
-    static uchar m24[2*R_MAX];
+    uchar *m21=m14 +    (rs-1);
+    uchar *m22=m21 +    (rs);
+    uchar *m23=m22 +    (rs+1);
+    uchar *m24=m23 +    (rs-1);
 
-    //m11
-    for(int i=r;i<-r;i--)
-        m11[i]=i;
-    //m12
-    for(int i=0;i<2*r-1;i++)
-        m12[i]=-r;
-    for(int i=0;i<(2*r+1);i++)
-        m14=m11;
+    m21[rs]=r;
 
+    m22[rs-1]=m11[rs-1]=-(r-1);
+    m13[rs-1]=m24[rs-1]=-r;
+
+    m22[rs]=m11[rs]=-r;
+    m13[rs]=m24[rs]=r;
+
+    for(int i=r;i>=-(r-1);i--)
+    {
+        m23[j]=m12[j]=-r;
+        m14[j]=m21[j]= r;
+
+        m22[j]=m11[j]= i;
+        m13[j]=m24[j]=-i;
+
+        j++;
+    }
 }
 //! расчет разностей
 void calcDiff(uchar* di, uchar* index,int col, int row)
@@ -44,13 +60,12 @@ void calcDiff(uchar* di, uchar* index,int col, int row)
     for(int i=0;i<row;i++)
     {
         for(int j=1;j<col;j++)
-            di[i*row+j-1]=index[i*row+j]-index[i*row+j-1];
+            di[i*col+j-1]=index[i*col+j]-index[i*col+j-1];
     }
 }
 //! расчет
-void calcArray(int r,
-               uchar *mA,uchar *mB,int col,int row,
-               uchar *index,uchar* di,int rowIndex,int colIndex)
+void calcArray(uchar *mA,uchar *mB,int col,int row,uchar *v1,uchar *v2,
+               uchar *index,uchar* di,int colIndex,int rowIndex)
 {
     static uchar vv1[ROW_MAX];
     static uchar vv3[ROW_MAX];
@@ -58,49 +73,48 @@ void calcArray(int r,
     static uchar vv2[COL_MAX];
     static uchar vv4[COL_MAX];
 
-    for(int l=0;l<col;l++)
+    for(int l=0;l<colIndex;l++)
     {
-        float r1=2*l;
-        float r2=2*l+1;
+        //! индексы
+        int r2=(l+1)<<1;
+        int r1=r2-1;
         for(int i=0;i<colIndex;i++)
         {
-            vv1[i]=v1[i]+index[0*rowIndex + r]%col;
-            vv3[i]=vv1[i]+di[0*rowIndex + r]%col;
+            vv1[i]=v1[i]+index[0*rowIndex + l]%row;
+            vv3[i]=vv1[i]+di[0*rowIndex + l]%row;
         }
         for(int i=0;i<rowIndex;i++)
         {
-            vv2[i]=v2[i]+index[1*rowIndex + r]%row;
-            vv4[i]=vv2[i]+index[1*rowIndex + r]%row;
+            vv2[i]=v2[i]+index[1*rowIndex + l]%col;
+            vv4[i]=vv2[i]+index[1*rowIndex + l]%col;
         }
         for(int i=0;i<row;i++)
         {
             for(int j=0;j<col;j++)
             {
-                mB[i*row+j*col + r1*(row*col)]=mA[i*row+j*col + r*(row*col)]+
-                                               mA[(vv1[i]+1)*row+(vv2[j]+1)*col + r*(row*col)];
-                mB[i*row+j*col + r2*(row*col)]=mA[i*row+j*col + r*(row*col)]+
-                                               mA[(vv3[i]+1)*row+(vv4[j]+1)*col + r*(row*col)];
+                mB[i*col+j + r1*(row*col)]=mA[i*col+j + l*(row*col)]+
+                                               mA[(vv1[i]+1)*col+(vv2[j]+1) + l*(row*col)];
+                mB[i*col+j + r2*(row*col)]=mA[i*col+j + l*(row*col)]+
+                                               mA[(vv3[i]+1)*col+(vv4[j]+1) + l*(row*col)];
             }
         }
     }
 }
 
 //!
-uchar* fullHoughTransformAsym(uchar* image, int row,int col, float r0)
+uchar* fullHoughTransformAsym(uchar* image, int row,int col, int r0)
 {
     int r=1;
 
-    static uchar v1[ROW_MAX];//можно улучшить
-    static uchar v2[COL_MAX];
+    uchar v1[ROW_MAX];//можно улучшить
+    uchar v2[COL_MAX];
+    uchar index[8*R_MAX];
+    uchar di[8*R_MAX+2];
     //!  инициализация массивов
     for(int i=0;i<row;i++)
         v1[i]=i;
     for(int j=0;j<col;j++)
-        v2[i]=j;
-
-
-    uchar *index=0;
-    uchar *di=0;
+        v2[j]=j;
 
     int size=col*row;
 
@@ -116,30 +130,27 @@ uchar* fullHoughTransformAsym(uchar* image, int row,int col, float r0)
     {
         copyPartImage(mA+i*(size),image,size);
     }
+    int colIndex,rowIndex;
 
+    //createIndex(index,5,colIndex,rowIndex);
+    //calcDiff(di,index,colIndex,rowIndex);
+
+    uchar *x1=mB,*x2=mA,*x3=0;
     while(r<r0)
     {
-        createIndex(index,r);
-        calcDiff(di,index);
-        calcArray(r,mA,mB,row,col,index,di,);
+        x3=x1;x1=x2;x2=x3;
+        createIndex(index,r,colIndex,rowIndex);
+        calcDiff(di,index,colIndex,rowIndex);
+        calcArray(x1,x2,col,row,v1,v2,index,di,colIndex,rowIndex);
 
         r=r<<1;
-        if(r>=r0)
-            return mB;
-
-        createIndex(index,r);
-        calcDiff(di,index);
-        calcArray(r,mB,mA,row,col,index,di,);
-
-        r=r<<1;
-        if(r>=r0)
-            return mA;
     }
 
+    return x1;
 }
 
 
-
+/*
 function y=full_hough_transform_asym(x,R0)
 
 %R - степень 2
@@ -209,3 +220,4 @@ while R<R0
             end
 
       end
+*/
