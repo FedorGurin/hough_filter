@@ -6,6 +6,7 @@
 //! width - ширина изображения
 typedef unsigned char uchar;
 #define R_MAX 10
+//! размеры изображения
 #define ROW_MAX 768
 #define COL_MAX 1024
 //! копирование части изображения
@@ -19,7 +20,7 @@ void createIndex(uchar* index,int r)
     //! создаем индексы
     static uchar m11[2*R_MAX+1];
     static uchar m12[2*R_MAX-1];
-    static uchar m13[2*R_MAX+1];//! тоже что и m11 только вдурогом порядке
+    static uchar m13[2*R_MAX+1];//! тоже что и m11 только ином порядке
     static uchar m14[2*R_MAX-1];//только сознаком минус
 
     static uchar m21[2*R_MAX];
@@ -72,11 +73,15 @@ void calcArray(int r,
             vv4[i]=vv2[i]+index[1*rowIndex + r]%row;
         }
         for(int i=0;i<row;i++)
+        {
             for(int j=0;j<col;j++)
             {
-                mB[i*row+j*col + r1*(row*col)]=mA[i*row+j*col + r*(row*col)]+mA[(vv1+1)*row+(vv2+1)*col + r*(row*col)];
-                mB[i*row+j*col + r2*(row*col)]=mA[i*row+j*col + r*(row*col)]+mA[(vv3+1)*row+(vv4+1)*col + r*(row*col)];
+                mB[i*row+j*col + r1*(row*col)]=mA[i*row+j*col + r*(row*col)]+
+                                               mA[(vv1[i]+1)*row+(vv2[j]+1)*col + r*(row*col)];
+                mB[i*row+j*col + r2*(row*col)]=mA[i*row+j*col + r*(row*col)]+
+                                               mA[(vv3[i]+1)*row+(vv4[j]+1)*col + r*(row*col)];
             }
+        }
     }
 }
 
@@ -98,12 +103,13 @@ uchar* fullHoughTransformAsym(uchar* image, int row,int col, float r0)
     uchar *di=0;
 
     int size=col*row;
+
     //! содание массива B
     uchar* mB=new uchar[size*r0];
     memset((void*)mB,0,sizeof(uchar)*size*r0);
     //! создание массива A
     uchar* mA=new uchar[size*r0*8];
-    memset((void*)mA,0,sizeof(uchar)*size*r0*8);
+    memset((void*)mA,0,sizeof(uchar)*size*(r0<<3));
 
     //! заполнение массива A копиями из исходного изображения
     for(int i=0;i<(r0<<3);i++)
@@ -138,7 +144,7 @@ function y=full_hough_transform_asym(x,R0)
 
 %R - степень 2
 
-
+N- строки
 [N,M]=size(x);
 
 B=zeros(N,M,8*R0);
