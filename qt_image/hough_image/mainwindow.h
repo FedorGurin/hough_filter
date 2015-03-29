@@ -5,6 +5,7 @@
 #include <QFileDialog>
 #include <QString>
 #include <QImage>
+#include <QPaintEvent>
 
 namespace Ui {
 class MainWindow;
@@ -21,8 +22,11 @@ public:
     QFileDialog *dialog;
     QImage image;
     void openFile(QString name);
+protected:
+    virtual void paintEvent(QPaintEvent *event) ;
 public slots:
     void slotOpenFile();
+    void slotOpenAHough();
 private:
     Ui::MainWindow *ui;
 };
