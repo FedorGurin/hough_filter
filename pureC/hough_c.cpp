@@ -17,7 +17,7 @@ void copyPartImage(uchar* to,uchar *from,int size)
     memcpy((void*)to,(void*)from,sizeof(uchar)*size);
 }
 //! создание индексной матрицы(ok)
-void createIndex(uchar* index,int r,int &col,int &row)
+void createIndex(char* index,int r,int &col,int &row)
 {
     //кол-во столбцов
     col=8*r;
@@ -26,15 +26,15 @@ void createIndex(uchar* index,int r,int &col,int &row)
     int rs=r<<1;
     int j=0;
     //! указатели на элементы индексной матрицы
-    uchar *m11=index +  (0);
-    uchar *m12=m11 +    (rs+1);
-    uchar *m13=m12 +    (rs-1);
-    uchar *m14=m13 +    (rs+1);
+    char *m11=index +  (0);
+    char *m12=m11 +    (rs+1);
+    char *m13=m12 +    (rs-1);
+    char *m14=m13 +    (rs+1);
 
-    uchar *m21=m14 +    (rs-1);
-    uchar *m22=m21 +    (rs);
-    uchar *m23=m22 +    (rs+1);
-    uchar *m24=m23 +    (rs-1);
+    char *m21=m14 +    (rs-1);
+    char *m22=m21 +    (rs);
+    char *m23=m22 +    (rs+1);
+    char *m24=m23 +    (rs-1);
 
     m21[rs]=r;
 
@@ -56,23 +56,33 @@ void createIndex(uchar* index,int r,int &col,int &row)
     }
 }
 //! расчет разностей
-void calcDiff(uchar* di, uchar* index,int col, int row)
+void calcDiff(char* di, char* index,int col, int row)
 {
     for(int i=0;i<row;i++)
     {
         for(int j=1;j<col;j++)
             di[i*col+j-1]=index[i*col+j]-index[i*col+j-1];
     }
+    di[col-1]=di[col-2];
+    di[(row*col)-1]=di[(row*col)-2];
 }
+int mod(int value,int det)
+{
+    if(value<0)
+        return det+value;
+    else
+        return value%det;
+}
+
 //! расчет
 void calcArray(uchar *mA,uchar *mB,int col,int row,int *v1,int *v2,
-               uchar *index,uchar* di,int colIndex,int rowIndex)
+               char *index,char* di,int colIndex,int rowIndex)
 {
-    static uchar vv1[ROW_MAX];
-    static uchar vv3[ROW_MAX];
+    static int vv1[ROW_MAX];
+    static int vv3[ROW_MAX];
 
-    static uchar vv2[COL_MAX];
-    static uchar vv4[COL_MAX];
+    static int vv2[COL_MAX];
+    static int vv4[COL_MAX];
 
     for(int l=0;l<colIndex;l++)
     {
@@ -81,22 +91,22 @@ void calcArray(uchar *mA,uchar *mB,int col,int row,int *v1,int *v2,
         int r1=r2-1;
         for(int i=0;i<row;i++)
         {
-            vv1[i]=v1[i]+index[0*colIndex + l]%row;
-            vv3[i]=vv1[i]+di[0*colIndex + l]%row;
+            vv1[i]=mod((v1[i]+index[0*colIndex + l]),row);
+            vv3[i]=mod((vv1[i]+di[0*colIndex + l]),row);
         }
         for(int i=0;i<col;i++)
         {
-            vv2[i]=v2[i]+index[1*colIndex + l]%col;
-            vv4[i]=vv2[i]+index[1*colIndex + l]%col;
+            vv2[i]=mod((v2[i]+index[1*colIndex + l]),col);
+            vv4[i]=mod((vv2[i]+di[1*colIndex + l]),col);
         }
         for(int i=0;i<row;i++)
         {
             for(int j=0;j<col;j++)
             {
                 mB[i*col+j + r1*(row*col)]=mA[i*col+j + l*(row*col)]+
-                                               mA[vv1[i]*col+vv2[j] + l*(row*col)];
+                                               mA[(vv1[i])*col+vv2[j] -1 + l*(row*col)];
                 mB[i*col+j + r2*(row*col)]=mA[i*col+j + l*(row*col)]+
-                                               mA[vv3[i]*col+vv4[j] + l*(row*col)];
+                                               mA[(vv3[i])*col+vv4[j] -1 + l*(row*col)];
             }
         }
     }
@@ -109,8 +119,8 @@ uchar* fullHoughTransformAsym(uchar* image, int row,int col, int r0)
 
     int v1[ROW_MAX];//можно улучшить
     int v2[COL_MAX];
-    uchar index[8*R_MAX];
-    uchar di[8*R_MAX+2];
+    char index[8*R_MAX*2];
+    char di[(8*R_MAX+2)*2];
     //!  инициализация массивов
     for(int i=0;i<row;i++)
         v1[i]=i;
@@ -129,9 +139,11 @@ uchar* fullHoughTransformAsym(uchar* image, int row,int col, int r0)
     //! заполнение массива A копиями из исходного изображения
     for(int i=0;i<8*r0;i++)
     {
-        copyPartImage(mA+i*(size),image,10);
+        copyPartImage(mA+i*(size),image,size);
     }
-    int colIndex,rowIndex;
+    //return mA;
+
+    int colIndex=8*r0,rowIndex=2;
 
     uchar *x1=mB,*x2=mA,*x3=0;
     while(r<r0)
