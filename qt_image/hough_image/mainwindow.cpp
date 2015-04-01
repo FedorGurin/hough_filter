@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "hough_c.h"
 #include "QPainter"
+#include "omp.h"
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -35,8 +36,13 @@ void MainWindow::openFile(QString name)
 void MainWindow::slotOpenAHough()
 {
     uchar *ptr=image.bits();
-    result= fullHoughTransformAsym(image.bits(),image.height(),image.width(),16);
-    output=new uchar[image.height()*image.width()*16*8];
+
+
+
+    result= fullHoughTransformAsym(image.bits(),image.height(),image.width(),8);
+   // double t2 = omp_get_wtime();
+    ui->label_3->setText(QString::number((timeAll)));
+    output=new uchar[image.height()*image.width()*8*8];
     memcpy(output,result,sizeof(uchar)*image.height()*image.width());
 
     repaint();
@@ -63,7 +69,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
 
     if(image.isNull() == false){
 
-        painter.drawImage(image.rect(), image,image.rect());
+      //  painter.drawImage(image.rect(), image,image.rect());
     }
 }
 

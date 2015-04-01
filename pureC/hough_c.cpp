@@ -1,6 +1,6 @@
 #include <string.h>
 #include "hough_c.h"
-//#include "stdio.h"
+#include "omp.h"
 //! преобразование Хафа
 //! image - указатель на изображение
 //! r0 - длина(в пикселях) отрезков по которым идет интерполирование,
@@ -11,6 +11,7 @@
 //! размеры изображения
 #define ROW_MAX 1080
 #define COL_MAX 1920
+double timeAll;
 //! копирование части изображения
 void copyPartImage(uchar* to,uchar *from,int size)
 {
@@ -136,6 +137,7 @@ uchar* fullHoughTransformAsym(uchar* image, int row,int col, int r0)
     uchar* mA=new uchar[size*r0*8];
     memset((void*)mA,0,sizeof(uchar)*size*r0*8);
 
+           double t2 = omp_get_wtime();
     //! заполнение массива A копиями из исходного изображения
     for(int i=0;i<8*r0;i++)
     {
@@ -155,6 +157,8 @@ uchar* fullHoughTransformAsym(uchar* image, int row,int col, int r0)
 
         r=r<<1;
     }
+           double t1 = omp_get_wtime();
+           timeAll=t1-t2;
 
     return x1;
 }
