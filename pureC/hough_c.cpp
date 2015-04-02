@@ -24,28 +24,29 @@ void createIndex(char* index,int r,int &col,int &row)
     col=8*r;
     //кол-во строк
     row=2;
-    int rs=r<<1;
-    int j=0;
+    static int rs=r<<1;
+    static int rs_1=rs-1,rs1=rs+1;
+    static int j=0,i=0;
     //! указатели на элементы индексной матрицы
     char *m11=index +  (0);
-    char *m12=m11 +    (rs+1);
-    char *m13=m12 +    (rs-1);
-    char *m14=m13 +    (rs+1);
+    char *m12=m11 +    (rs1);
+    char *m13=m12 +    (rs_1);
+    char *m14=m13 +    (rs1);
 
-    char *m21=m14 +    (rs-1);
+    char *m21=m14 +    (rs_1);
     char *m22=m21 +    (rs);
-    char *m23=m22 +    (rs+1);
-    char *m24=m23 +    (rs-1);
+    char *m23=m22 +    (rs1);
+    char *m24=m23 +    (rs_1);
 
     m21[rs]=r;
 
-    m22[rs-1]=m11[rs-1]=-(r-1);
-    m13[rs-1]=m24[rs-1]=-r;
+    m22[rs_1]=m11[rs_1]=-(r-1);
+    m13[rs_1]=m24[rs_1]=-r;
 
     m22[rs]=m11[rs]=-r;
     m13[rs]=m24[rs]=r;
 
-    for(int i=r;i>=-(r-1);i--)
+    for(i=r;i>=m22[rs_1];i--)
     {
         m23[j]=m12[j]=-r;
         m14[j]=m21[j]= r;
@@ -59,13 +60,19 @@ void createIndex(char* index,int r,int &col,int &row)
 //! расчет разностей
 void calcDiff(char* di, char* index,int col, int row)
 {
-    for(int i=0;i<row;i++)
+    static int rowcol=col*row;
+    static int i,j;
+    static int m=i*col+j;
+    for(i=0;i<row;i++)
     {
-        for(int j=1;j<col;j++)
-            di[i*col+j-1]=index[i*col+j]-index[i*col+j-1];
+        for(j=1;j<col;j++){
+            m=i*col+j;
+            di[m-1]=index[m]-index[m-1];
+        }
     }
+
     di[col-1]=di[col-2];
-    di[(row*col)-1]=di[(row*col)-2];
+    di[(rowcol)-1]=di[(rowcol)-2];
 }
 int mod(int value,int det)
 {
@@ -143,8 +150,6 @@ uchar* fullHoughTransformAsym(uchar* image, int row,int col, int r0)
     {
         copyPartImage(mA+i*(size),image,size);
     }
-    //return mA;
-
     int colIndex=8*r0,rowIndex=2;
 
     uchar *x1=mB,*x2=mA,*x3=0;
