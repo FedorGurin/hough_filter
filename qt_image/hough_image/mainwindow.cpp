@@ -69,7 +69,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
 
     if(image.isNull() == false){
 
-      //  painter.drawImage(image.rect(), image,image.rect());
+        painter.drawImage(image.rect(), image,image.rect());
     }
 }
 

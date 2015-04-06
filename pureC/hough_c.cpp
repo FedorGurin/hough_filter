@@ -62,7 +62,7 @@ void calcDiff(char* di, char* index,int col, int row)
 {
     static int rowcol=col*row;
     static int i,j;
-    static int m=i*col+j;
+    static int m=0;
     for(i=0;i<row;i++)
     {
         for(j=1;j<col;j++){
@@ -91,30 +91,39 @@ void calcArray(uchar *mA,uchar *mB,int col,int row,int *v1,int *v2,
 
     static int vv2[COL_MAX];
     static int vv4[COL_MAX];
+    static int ij;
+    static int size;
+    int r1,r2,s;
+    int i,j;
+    ij=0;
+    size=row*col;
+
 
     for(int l=0;l<colIndex;l++)
     {
         //! индексы
-        int r2=((l+1)<<1)-1;
-        int r1=r2-1;
-        for(int i=0;i<row;i++)
+        r2=(((l+1)<<1)-1)*size;
+        r1=r2-size;
+        s=l*size;
+        for(i=0;i<row;i++)
         {
             vv1[i]=mod((v1[i]+index[0*colIndex + l]),row);
             vv3[i]=mod((vv1[i]+di[0*colIndex + l]),row);
         }
-        for(int i=0;i<col;i++)
+        for(i=0;i<col;i++)
         {
             vv2[i]=mod((v2[i]+index[1*colIndex + l]),col);
             vv4[i]=mod((vv2[i]+di[1*colIndex + l]),col);
         }
-        for(int i=0;i<row;i++)
+        int ij=0;
+        for(i=0;i<row;i++)
         {
-            for(int j=0;j<col;j++)
+            for(j=0;j<col;j++)
             {
-                mB[i*col+j + r1*(row*col)]=mA[i*col+j + l*(row*col)]+
-                                               mA[(vv1[i])*col+vv2[j] -1 + l*(row*col)];
-                mB[i*col+j + r2*(row*col)]=mA[i*col+j + l*(row*col)]+
-                                               mA[(vv3[i])*col+vv4[j] -1 + l*(row*col)];
+                ij=i*col+j;
+
+                mB[ij + r1]=mA[ij + s] + mA[(vv1[i])*col+vv2[j] -1 + s];
+                mB[ij + r2]=mA[ij + s] + mA[(vv3[i])*col+vv4[j] -1 + s];
             }
         }
     }

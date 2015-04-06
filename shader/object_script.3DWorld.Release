@@ -1,0 +1,14 @@
+INPUT(
+./release\main.o
+./release\view3dterrain.o
+./release\view3DArea.o
+./release\visual3D.o
+./release\visudp.o
+./release\formsettings.o
+./release\TemplateNASP.o
+./release\math_func.o
+./release\moc_view3dterrain.o
+./release\moc_view3DArea.o
+./release\moc_visudp.o
+./release\moc_formsettings.o
+);
