@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "hough_c.h"
+#include "c_hough_asym.h"
 #include "QPainter"
 #include "omp.h"
 MainWindow::MainWindow(QWidget *parent) :
