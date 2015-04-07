@@ -14,7 +14,7 @@
 #include <QDataStream>
 #include <QByteArray>
 
-using namespace qglviewer;
+
 #define SIZE_GRID 50
 #define MAX_Y 20000.0
 //#define PERIOD_ANIMATION 50
@@ -27,7 +27,7 @@ using namespace qglviewer;
 
 
 
-view3DArea::view3DArea():QGLViewer()
+View3DArea::View3DArea():QGLWidget()
 {
     resize(800,600);
     cameraToThisObj=0;
