@@ -15,9 +15,11 @@ INCLUDEPATH += ../../pureC/
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    ../../pureC/c_hough_asym.cpp
+    ../../pureC/c_hough_asym.cpp \
+    ../../pureC/c_hough_asym_sec.cpp
 
 HEADERS  += mainwindow.h \
-    ../../pureC/c_hough_asym.h
+    ../../pureC/c_hough_asym.h \
+    ../../pureC/c_hough_asym_sec.h
 
 FORMS    += mainwindow.ui

@@ -35,12 +35,19 @@ void MainWindow::openFile(QString name)
 }
 void MainWindow::slotOpenAHough()
 {
-    uchar *ptr=image.bits();
+
+    uchar *ptrImage=new uchar[image.height()*image.width()];
+    uchar *ptr=ptrImage;
 
 
-
+    for(int i=0;i<image.height();i++)
+    {
+        ptr=ptrImage+i*image.height();
+        memcpy(ptr,image.scanLine(i),image.width());
+    }
+    double t1=omp_get_wtime();
     result= fullHoughTransformAsym(image.bits(),image.height(),image.width(),8);
-   // double t2 = omp_get_wtime();
+    double t2 = omp_get_wtime();
     ui->label_3->setText(QString::number((timeAll)));
     output=new uchar[image.height()*image.width()*8*8];
     memcpy(output,result,sizeof(uchar)*image.height()*image.width());
@@ -67,10 +74,10 @@ void MainWindow::paintEvent(QPaintEvent *event)
     }
 
 
-    if(image.isNull() == false){
+    /*if(image.isNull() == false){
 
         painter.drawImage(image.rect(), image,image.rect());
-    }
+    }*/
 }
 
 void MainWindow::slotOpenFile()

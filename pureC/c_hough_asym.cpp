@@ -46,6 +46,7 @@ void createIndex(char* index,int r,int &col,int &row)
     m22[rs]=m11[rs]=-r;
     m13[rs]=m24[rs]=r;
 
+//#pragma omp parallel for
     for(i=r;i>=m22[rs_1];i--)
     {
         m23[j]=m12[j]=-r;
