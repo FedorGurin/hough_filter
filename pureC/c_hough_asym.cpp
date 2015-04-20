@@ -1,16 +1,13 @@
 #include <string.h>
 #include "c_hough_asym.h"
-#include "omp.h"
+//#include "omp.h"
 //! преобразование Хафа
 //! image - указатель на изображение
 //! r0 - длина(в пикселях) отрезков по которым идет интерполирование,
 //! height - высота изображение
 //! width - ширина изображения
 
-#define R_MAX 32
-//! размеры изображения
-#define ROW_MAX 1080
-#define COL_MAX 1920
+
 double timeAll;
 //! копирование части изображения
 void copyPartImage(uchar* to,uchar *from,int size)
@@ -131,49 +128,53 @@ void calcArray(uchar *mA,uchar *mB,int col,int row,int *v1,int *v2,
 }
 
 //!
-uchar* fullHoughTransformAsym(uchar* image, int row,int col, int r0)
+uchar* fullHoughTransformAsym(THough *f, int r0)
 {
     int r=1;
 
-    int v1[ROW_MAX];//можно улучшить
-    int v2[COL_MAX];
-    char index[8*R_MAX*2];
-    char di[(8*R_MAX+2)*2];
-    //!  инициализация массивов
-    for(int i=0;i<row;i++)
-        v1[i]=i;
-    for(int j=0;j<col;j++)
-        v2[j]=j;
+    //int v1[ROW_MAX];//можно улучшить
+    //int v2[COL_MAX];
+    //char index[8*R_MAX*2];
+    //char di[(8*R_MAX+2)*2];
 
-    int size=col*row;
+//    //!  инициализация массивов
+//    for(int i=0;i<row;i++)
+//        v1[i]=i;
+//    for(int j=0;j<col;j++)
+//        v2[j]=j;
 
-    //! содание массива B
-    uchar* mB=new uchar[size*r0*8];
-    memset((void*)mB,0,sizeof(uchar)*size*r0*8);
-    //! создание массива A
-    uchar* mA=new uchar[size*r0*8];
-    memset((void*)mA,0,sizeof(uchar)*size*r0*8);
+//    int size=col*row;
 
-           double t2 = omp_get_wtime();
+//    //! содание массива B
+//    uchar* mB=new uchar[size*r0*8];
+//    memset((void*)mB,0,sizeof(uchar)*size*r0*8);
+//    //! создание массива A
+//    uchar* mA=new uchar[size*r0*8];
+//    memset((void*)mA,0,sizeof(uchar)*size*r0*8);
+
+
+    //! первая отсечка времени
+    //double t2 = omp_get_wtime();
     //! заполнение массива A копиями из исходного изображения
     for(int i=0;i<8*r0;i++)
     {
-        copyPartImage(mA+i*(size),image,size);
+        copyPartImage(f->mA+i*(f->size),f->image,f->size);
     }
     int colIndex=8*r0,rowIndex=2;
 
-    uchar *x1=mB,*x2=mA,*x3=0;
+    uchar *x1=f->mB,*x2=f->mA,*x3=0;
     while(r<r0)
     {        
         x3=x1;x1=x2;x2=x3;
-        createIndex(index,r,colIndex,rowIndex);
-        calcDiff(di,index,colIndex,rowIndex);
-        calcArray(x1,x2,col,row,v1,v2,index,di,colIndex,rowIndex);
+        createIndex(f->index,r,colIndex,rowIndex);
+        calcDiff(f->di,f->index,colIndex,rowIndex);
+        calcArray(x1,x2,f->col,f->row,f->v1,f->v2,f->index,f->di,colIndex,rowIndex);
 
         r=r<<1;
     }
-           double t1 = omp_get_wtime();
-           timeAll=t1-t2;
+    //! вторая отсечка времени
+    //double t1 = omp_get_wtime();
+    //timeAll=t1-t2;
 
     return x1;
 }

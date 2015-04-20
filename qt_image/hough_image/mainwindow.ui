@@ -179,7 +179,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QSpinBox" name="spinBox">
+              <widget class="QSpinBox" name="spinBoxLevel">
                <property name="maximum">
                 <number>255</number>
                </property>

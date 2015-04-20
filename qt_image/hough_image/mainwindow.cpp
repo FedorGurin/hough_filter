@@ -16,68 +16,77 @@ MainWindow::MainWindow(QWidget *parent) :
     dialog->setFileMode(QFileDialog::AnyFile);
     //dialog->setDirectory(settingVV->dirSaveVar);
 
+
     connect(ui->pushButtonOpenFile,SIGNAL(clicked(bool)),this,SLOT(slotOpenFile()));
     connect(ui->pushButtonAHough,SIGNAL(clicked(bool)),this,SLOT(slotOpenAHough()));
-    connect(ui->spinBoxAcc,SIGNAL(valueChanged(int)),this,SLOT(slotSpinBox()));
-    connect(ui->spinBox,SIGNAL(valueChanged(int)),this,SLOT(slotSpinBox()));
+    connect(ui->spinBoxAcc,SIGNAL(valueChanged(int)),this,SLOT(slotSelectImage()));
+    connect(ui->spinBoxLevel,SIGNAL(valueChanged(int)),this,SLOT(slotSelectImage()));
 }
 void MainWindow::slotSpinBox()
 {
     repaint();
 }
+void MainWindow::slotSelectImage()
+{
+    ///image.setColorCount(2);
+
+   /* image.setColor(0,QRgb(Qt::black));
+    image.setColor(0,QRgb(Qt::white));*/
+    QVector<QRgb> rgbs;
+    rgbs.append(QRgb(Qt::black));
+    rgbs.append(QRgb(Qt::white));
+    image.setColorTable(rgbs);
+
+    int sizeImage=image.width()*image.height();
+    int r=ui->spinBoxAcc->value();
+    if(result != 0)
+    {
+        for(int x=0;x<image.width();x++)
+        {
+            for(int y=0;y<image.height();y++)
+            {
+                if(result[y*image.width() + x + sizeImage*r]>ui->spinBoxLevel->value())
+                    image.setPixel(x,y,1);
+                else
+                    image.setPixel(x,y,0);
+            }
+        }
+    }
+    repaint();
+}
 
 void MainWindow::openFile(QString name)
 {
-    QImage im(name);
-    QImage i1=im.convertToFormat(QImage::Format_Indexed8,Qt::MonoOnly);
-    image=i1;
+    //! загрузить файл
+    image.load(name);
+    //! преобразовать файл
+    image=image.convertToFormat(QImage::Format_Indexed8,Qt::MonoOnly);
+
+    //! содание структуры фильтра
+    filtr=new THough(image.bits(),image.height(),image.width());
+    //! перерисование файла
     repaint();
 }
 void MainWindow::slotOpenAHough()
 {
-
-    uchar *ptrImage=new uchar[image.height()*image.width()];
-    uchar *ptr=ptrImage;
-
-
-    for(int i=0;i<image.height();i++)
-    {
-        ptr=ptrImage+i*image.height();
-        memcpy(ptr,image.scanLine(i),image.width());
-    }
     double t1=omp_get_wtime();
-    result= fullHoughTransformAsym(image.bits(),image.height(),image.width(),8);
+    //! локальное преобразование Хаффа
+    result= fullHoughTransformAsym(filtr,16);
     double t2 = omp_get_wtime();
-    ui->label_3->setText(QString::number((timeAll)));
-    output=new uchar[image.height()*image.width()*8*8];
-    memcpy(output,result,sizeof(uchar)*image.height()*image.width());
+    //! время на расчет преобразования Фильтра Хаффа
+    ui->label_3->setText(QString::number((t2-t1)));
+
 
     repaint();
 }
-
+//! перерисовка
 void MainWindow::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
-    if(result != 0)
-    {
-        int size=sizeof(uchar)*image.width()*image.height();
-
-        for(int i=0;i<image.width()*image.height();i++)
-        {
-            if((result[i+ui->spinBoxAcc->value()*(size)])>ui->spinBox->value())
-                (output[i+ui->spinBoxAcc->value()*(size)])=255;
-            else
-                (output[i+ui->spinBoxAcc->value()*(size)])=0;
-        }
-        QImage res(output+ui->spinBoxAcc->value()*(size),image.width(),image.height(),QImage::Format_Indexed8);
-        image=res;
-    }
-
-
-    /*if(image.isNull() == false){
+    if(image.isNull() == false){
 
         painter.drawImage(image.rect(), image,image.rect());
-    }*/
+    }
 }
 
 void MainWindow::slotOpenFile()

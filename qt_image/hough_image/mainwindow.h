@@ -6,6 +6,7 @@
 #include <QString>
 #include <QImage>
 #include <QPaintEvent>
+#include "c_hough_asym.h"
 
 namespace Ui {
 class MainWindow;
@@ -30,8 +31,10 @@ public slots:
     void slotOpenFile();
     void slotOpenAHough();
     void slotSpinBox();
+    void slotSelectImage();
 private:
     Ui::MainWindow *ui;
+    THough *filtr;
 };
 
 #endif // MAINWINDOW_H

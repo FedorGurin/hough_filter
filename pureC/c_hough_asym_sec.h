@@ -7,7 +7,7 @@ extern double timeAll;
 #endif
 
 
-function [A,index]=full_hough_transform_asym_sec1(x,R0,sec)
+/*function [A,index]=full_hough_transform_asym_sec1(x,R0,sec)
 
 %R - степень 2, номер сектора от 1 до 8
 %Вариант для реализации на С++, используется один буфер
@@ -58,3 +58,4 @@ index=getindex(R,sec);
   di=di0(:,(sec-1)*R+(1:R));
 © 2015 Microsoft Условия Заявление о конфиденциальности и использовании файлов cookie Разработчикам Русский
 
+*/

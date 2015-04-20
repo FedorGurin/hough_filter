@@ -1,6 +1,6 @@
 #include <string.h>
 #include "c_hough_asym_sec.h"
-#include "omp.h"
+//#include "omp.h"
 //! преобразование Хафа
 //! image - указатель на изображение
 //! r0 - длина(в пикселях) отрезков по которым идет интерполирование,
@@ -57,8 +57,8 @@ void createIndex(char* index,int r,int &col,int &row, int sec)
         j++;
     }
 
-    for(i=1;i<=r;i++)
-        m11
+//    for(i=1;i<=r;i++)
+//        m11
 }
 //! расчет разностей
 void calcDiff(char* di, char* index,int col, int row,int sec)
@@ -156,7 +156,7 @@ uchar* fullHoughTransformAsymSec(uchar* image, int row,int col, int r0,int sec)
     uchar* mA=new uchar[size*r0*8];
     memset((void*)mA,0,sizeof(uchar)*size*r0*8);
 
-           double t2 = omp_get_wtime();
+           //double t2 = omp_get_wtime();
     //! заполнение массива A копиями из исходного изображения
     for(int i=0;i<8*r0;i++)
     {
@@ -168,7 +168,7 @@ uchar* fullHoughTransformAsymSec(uchar* image, int row,int col, int r0,int sec)
     while(r<r0)
     {        
         x3=x1;x1=x2;x2=x3;
-        createIndex(index,r,colIndex,rowIndex);
+        createIndex(index,r,colIndex,rowIndex,1);
         calcDiff(di,index,colIndex,rowIndex,sec);
         calcArray(x1,x2,col,row,v1,v2,index,di,colIndex,rowIndex);
 
