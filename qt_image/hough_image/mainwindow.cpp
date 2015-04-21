@@ -28,14 +28,16 @@ void MainWindow::slotSpinBox()
 }
 void MainWindow::slotSelectImage()
 {
-    ///image.setColorCount(2);
+    //image.setColorCount(1);
 
    /* image.setColor(0,QRgb(Qt::black));
     image.setColor(0,QRgb(Qt::white));*/
     QVector<QRgb> rgbs;
-    rgbs.append(QRgb(Qt::black));
-    rgbs.append(QRgb(Qt::white));
+
+    rgbs.append(qRgb(0,0,0));
+    rgbs.append(qRgb(255,255,255));
     image.setColorTable(rgbs);
+    int y=image.colorCount();
 
     int sizeImage=image.width()*image.height();
     int r=ui->spinBoxAcc->value();
@@ -71,7 +73,7 @@ void MainWindow::slotOpenAHough()
 {
     double t1=omp_get_wtime();
     //! локальное преобразование Хаффа
-    result= fullHoughTransformAsym(filtr,16);
+    result= fullHoughTransformAsym(filtr,32);
     double t2 = omp_get_wtime();
     //! время на расчет преобразования Фильтра Хаффа
     ui->label_3->setText(QString::number((t2-t1)));

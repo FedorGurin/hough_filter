@@ -21,9 +21,12 @@ void createIndex(char* index,int r,int &col,int &row)
     col=8*r;
     //кол-во строк
     row=2;
-    static int rs=r<<1;
-    static int rs_1=rs-1,rs1=rs+1;
-    static int j=0,i=0;
+    static int rs;
+    static int rs_1,rs1;
+    int j=0,i=0;
+
+    rs=r<<1;
+    rs_1=rs-1,rs1=rs+1;
     //! указатели на элементы индексной матрицы
     char *m11=index +  (0);
     char *m12=m11 +    (rs1);
@@ -58,9 +61,9 @@ void createIndex(char* index,int r,int &col,int &row)
 //! расчет разностей
 void calcDiff(char* di, char* index,int col, int row)
 {
-    static int rowcol=col*row;
-    static int i,j;
-    static int m=0;
+    int rowcol=col*row;
+    int i,j;
+    int m=0;
     for(i=0;i<row;i++)
     {
         for(j=1;j<col;j++){
@@ -120,8 +123,8 @@ void calcArray(uchar *mA,uchar *mB,int col,int row,int *v1,int *v2,
             {
                 ij=i*col+j;
 
-                mB[ij + r1]=mA[ij + s] + mA[(vv1[i])*col+vv2[j] -1 + s];
-                mB[ij + r2]=mA[ij + s] + mA[(vv3[i])*col+vv4[j] -1 + s];
+                mB[ij + r1]=mA[ij + s] + mA[(vv1[i])*col+vv2[j] + s];
+                mB[ij + r2]=mA[ij + s] + mA[(vv3[i])*col+vv4[j] + s];
             }
         }
     }
@@ -132,35 +135,12 @@ uchar* fullHoughTransformAsym(THough *f, int r0)
 {
     int r=1;
 
-    //int v1[ROW_MAX];//можно улучшить
-    //int v2[COL_MAX];
-    //char index[8*R_MAX*2];
-    //char di[(8*R_MAX+2)*2];
-
-//    //!  инициализация массивов
-//    for(int i=0;i<row;i++)
-//        v1[i]=i;
-//    for(int j=0;j<col;j++)
-//        v2[j]=j;
-
-//    int size=col*row;
-
-//    //! содание массива B
-//    uchar* mB=new uchar[size*r0*8];
-//    memset((void*)mB,0,sizeof(uchar)*size*r0*8);
-//    //! создание массива A
-//    uchar* mA=new uchar[size*r0*8];
-//    memset((void*)mA,0,sizeof(uchar)*size*r0*8);
-
-
-    //! первая отсечка времени
-    //double t2 = omp_get_wtime();
+    int colIndex=8*r0,rowIndex=2;
     //! заполнение массива A копиями из исходного изображения
-    for(int i=0;i<8*r0;i++)
+    for(int i=0;i<colIndex;i++)
     {
         copyPartImage(f->mA+i*(f->size),f->image,f->size);
     }
-    int colIndex=8*r0,rowIndex=2;
 
     uchar *x1=f->mB,*x2=f->mA,*x3=0;
     while(r<r0)
@@ -172,10 +152,6 @@ uchar* fullHoughTransformAsym(THough *f, int r0)
 
         r=r<<1;
     }
-    //! вторая отсечка времени
-    //double t1 = omp_get_wtime();
-    //timeAll=t1-t2;
-
-    return x1;
+    return x2;
 }
 
