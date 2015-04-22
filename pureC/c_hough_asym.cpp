@@ -103,7 +103,10 @@ void calcArray(uchar *mA,uchar *mB,int col,int row,int *v1,int *v2,
     for(int l=0;l<colIndex;l++)
     {
         //! индексы
-        r2=(((l+1)<<1)-1)*size;
+        r2=(((l+1)<<1)-1);
+        r1=r2;
+
+        r2=r2*size;
         r1=r2-size;
         s=l*size;
         for(i=0;i<row;i++)

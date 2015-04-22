@@ -73,7 +73,7 @@ void MainWindow::slotOpenAHough()
 {
     double t1=omp_get_wtime();
     //! локальное преобразование Хаффа
-    result= fullHoughTransformAsym(filtr,32);
+    result= fullHoughTransformAsym(filtr,8);
     double t2 = omp_get_wtime();
     //! время на расчет преобразования Фильтра Хаффа
     ui->label_3->setText(QString::number((t2-t1)));
