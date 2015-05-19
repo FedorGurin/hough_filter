@@ -100,7 +100,7 @@
          </palette>
         </property>
         <property name="title">
-         <string>GroupBox</string>
+         <string>Управление</string>
         </property>
         <layout class="QGridLayout" name="gridLayout">
          <item row="0" column="0">
@@ -118,7 +118,21 @@
            <item>
             <widget class="QPushButton" name="pushButtonAHough">
              <property name="text">
-              <string>Ассиметричный Хаффа</string>
+              <string>Ассиметр</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButton">
+             <property name="text">
+              <string>Симметрич</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButton_2">
+             <property name="text">
+              <string>Секторн</string>
              </property>
             </widget>
            </item>
@@ -160,6 +174,20 @@
             </layout>
            </item>
            <item>
+            <widget class="QLabel" name="label_4">
+             <property name="text">
+              <string>R0=</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="spinBoxR0">
+             <property name="value">
+              <number>4</number>
+             </property>
+            </widget>
+           </item>
+           <item>
             <layout class="QVBoxLayout" name="verticalLayout_2">
              <item>
               <widget class="QLabel" name="label_2">
@@ -193,7 +221,7 @@
            <item>
             <widget class="QLabel" name="label_3">
              <property name="text">
-              <string>TextLabel</string>
+              <string>Время выполнения</string>
              </property>
             </widget>
            </item>

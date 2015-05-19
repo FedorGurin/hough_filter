@@ -71,9 +71,11 @@ void MainWindow::openFile(QString name)
 }
 void MainWindow::slotOpenAHough()
 {
+    ui->spinBoxAcc->setMinimum(0);
+    ui->spinBoxAcc->setMaximum(8*ui->spinBoxR0->value()-1);
     double t1=omp_get_wtime();
     //! локальное преобразование Хаффа
-    result= fullHoughTransformAsym(filtr,8);
+    result= fullHoughTransformAsym(filtr,ui->spinBoxR0->value());
     double t2 = omp_get_wtime();
     //! время на расчет преобразования Фильтра Хаффа
     ui->label_3->setText(QString::number((t2-t1)));

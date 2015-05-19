@@ -6,8 +6,8 @@ typedef unsigned char uchar;
 //! радиус
 #define R_MAX 32
 //! размеры изображения
-#define ROW_MAX 1281
-#define COL_MAX 1921
+#define ROW_MAX 1280
+#define COL_MAX 1920
 
 typedef struct THoughAsym_
 {
