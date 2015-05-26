@@ -1,6 +1,6 @@
 #include <string.h>
 #include "c_hough_asym.h"
-//#include "omp.h"
+#include "omp.h"
 //! преобразование Хафа
 //! image - указатель на изображение
 //! r0 - длина(в пикселях) отрезков по которым идет интерполирование,
@@ -27,6 +27,7 @@ void createIndex(char* index,int r,int &col,int &row)
 
     rs=r<<1;
     rs_1=rs-1,rs1=rs+1;
+
     //! указатели на элементы индексной матрицы
     char *m11=index +  (0);
     char *m12=m11 +    (rs1);
@@ -46,7 +47,7 @@ void createIndex(char* index,int r,int &col,int &row)
     m22[rs]=m11[rs]=-r;
     m13[rs]=m24[rs]=r;
 
-//#pragma omp parallel for
+#pragma omp parallel for
     for(i=r;i>=m22[rs_1];i--)
     {
         m23[j]=m12[j]=-r;
@@ -99,7 +100,7 @@ void calcArray(uchar *mA,uchar *mB,int col,int row,int *v1,int *v2,
     ij=0;
     size=row*col;
 
-
+#pragma omp parallel for
     for(int l=0;l<colIndex;l++)
     {
         //! индексы
