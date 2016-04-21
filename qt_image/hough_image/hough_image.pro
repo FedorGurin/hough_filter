@@ -18,9 +18,11 @@ QMAKE_LFLAGS += -openmp
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    ../../pureC/c_hough_asym.cpp
+    ../../pureC/c_hough_asym.cpp \
+    ../../pureC/cpu_hough_asym.cpp
 
 HEADERS  += mainwindow.h \
-    ../../pureC/c_hough_asym.h
+    ../../pureC/c_hough_asym.h \
+    ../../pureC/cpu_hough_asym.h
 
 FORMS    += mainwindow.ui
