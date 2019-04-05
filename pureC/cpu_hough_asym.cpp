@@ -1,5 +1,5 @@
 #include <string.h>
-#include "c_hough_asym.h"
+#include "cpu_hough_asym.h"
 #include "omp.h"
 //! преобразование Хафа
 //! image - указатель на изображение
