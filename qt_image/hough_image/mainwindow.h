@@ -6,7 +6,7 @@
 #include <QString>
 #include <QImage>
 #include <QPaintEvent>
-#include "c_hough_asym.h"
+#include "cpu_hough_asym.h"
 
 namespace Ui {
 class MainWindow;
